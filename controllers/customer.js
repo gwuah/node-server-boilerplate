@@ -1,16 +1,14 @@
-const joi = require("joi");
+const Joi = require("joi");
 const constants = require("../constants");
 const utilities = require("../utilities");
 const Customer = require("../models/Customer");
 
-exports.create = async (query, data) => {
+exports.create = async (query, body) => {
   const schema = Joi.object({
     name: Joi.string()
       .required()
       .lowercase(),
-    email: Joi.string()
-      .email()
-      .required(),
+    email: Joi.string().email(),
     telephone: Joi.string()
       .required()
       .min(10),
@@ -19,7 +17,8 @@ exports.create = async (query, data) => {
     role: Joi.string().valid([constants.roles.customer])
   });
 
-  const { error, response: data } = utilities.validate(schema.validate(data));
+  const { error, response } = utilities.validate([schema.validate(body)]);
+  const data = response[0];
 
   if (error) {
     return { error: true, data };
